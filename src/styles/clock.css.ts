@@ -7,9 +7,17 @@ export const dial = style({
   width: 'min(90vw, 60dvh, 520px)',
   height: 'auto',
   aspectRatio: '1',
+  borderRadius: '50%',
+  cursor: 'grab',
+  // REQ-DRAG-005: the dial owns all touch gestures.
+  touchAction: 'none',
   userSelect: 'none',
   WebkitUserSelect: 'none',
+  WebkitTouchCallout: 'none',
   WebkitTapHighlightColor: 'transparent',
+  selectors: {
+    '&[data-dragging="true"]': { cursor: 'grabbing' },
+  },
 });
 
 export const rim = style({

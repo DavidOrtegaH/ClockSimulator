@@ -1,5 +1,6 @@
 <script lang="ts">
   import ClockFace from './components/ClockFace.svelte';
+  import Controls from './components/Controls.svelte';
   import TimePhrase from './components/TimePhrase.svelte';
   import { Clock } from './lib/clock.svelte';
   import { fromDate } from './lib/time';
@@ -23,4 +24,5 @@
   <h1 class={s.title}>Clock Simulator</h1>
   <ClockFace {clock} />
   <TimePhrase phrase={clock.phrase} announce={!clock.playing} />
+  <Controls {clock} />
 </main>

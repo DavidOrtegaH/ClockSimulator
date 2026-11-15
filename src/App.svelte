@@ -22,7 +22,13 @@
 
 <main class={s.main}>
   <h1 class={s.title}>Clock Simulator</h1>
-  <ClockFace {clock} />
-  <TimePhrase phrase={clock.phrase} announce={!clock.playing} />
-  <Controls {clock} />
+  <div class={s.dialArea}>
+    <ClockFace {clock} />
+  </div>
+  <div class={s.phraseArea}>
+    <TimePhrase phrase={clock.phrase} announce={!clock.playing} />
+  </div>
+  <div class={s.controlsArea}>
+    <Controls {clock} />
+  </div>
 </main>

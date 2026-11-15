@@ -27,11 +27,11 @@ Each spec is a Markdown file named `NNN-short-name.md` with:
 
 ## Index
 
-| Spec                                                        | Area     | Status |
-| ----------------------------------------------------------- | -------- | ------ |
-| [001 Time model](001-time-model.md)                         | `TIME`   | —      |
-| [002 Time phrase](002-time-phrase.md)                       | `PHRASE` | —      |
-| [003 Clock face](003-clock-face.md)                         | `FACE`   | —      |
-| [004 Controls](004-controls.md)                             | `CTRL`   | —      |
-| [005 Hand dragging](005-hand-dragging.md)                   | `DRAG`   | —      |
-| [006 Security & deployment](006-security-and-deployment.md) | `SEC`    | —      |
+| Spec                                                        | Area     | Status      |
+| ----------------------------------------------------------- | -------- | ----------- |
+| [001 Time model](001-time-model.md)                         | `TIME`   | Implemented |
+| [002 Time phrase](002-time-phrase.md)                       | `PHRASE` | Implemented |
+| [003 Clock face](003-clock-face.md)                         | `FACE`   | Implemented |
+| [004 Controls](004-controls.md)                             | `CTRL`   | Implemented |
+| [005 Hand dragging](005-hand-dragging.md)                   | `DRAG`   | Implemented |
+| [006 Security & deployment](006-security-and-deployment.md) | `SEC`    | Implemented |

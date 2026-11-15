@@ -29,7 +29,7 @@ the elapsed seconds within a 12-hour dial — from which every hand angle is der
 - **Given** the clock reads 3:00:00, **when** the minute hand is rotated +90°, **then** the clock reads 3:15:00 and the hour hand moved +7.5°.
 - **Given** the clock reads 3:59:30, **when** the seconds hand is rotated +180°, **then** the clock reads 4:00:00.
 - **Given** the clock reads 12:00:00, **when** the hour hand is rotated −30°, **then** the clock reads 11:00:00.
-- **Given** 3:00:42 and an hour/minute adjustment landing on 3:15:10.6, **when** it is snapped, **then** the clock reads 3:15:42.
+- **Given** 3:00:42 and an hour/minute adjustment landing on 3:15:20, **when** it is snapped, **then** the clock reads 3:15:42.
 - **Given** a hand at 350°, **when** the pointer moves to 10°, **then** the angular delta is +20°, not −340°.
 - **Given** a local time of 15:25:42.500, **when** the clock starts, **then** `t = 12342.5`.
 

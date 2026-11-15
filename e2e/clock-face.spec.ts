@@ -13,7 +13,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 test('REQ-FACE-001: draws 60 ticks and the numbers 1–12', async ({ page }) => {
-  const svg = page.getByRole('img', { name: 'Analog clock' });
+  const svg = page.getByRole('slider', { name: /Analog clock/ });
   await expect(svg.locator('line:not([data-hand])')).toHaveCount(60);
   await expect(svg.locator('text')).toHaveText(Array.from({ length: 12 }, (_, i) => `${i + 1}`));
 });
@@ -43,7 +43,7 @@ test('REQ-FACE-006: fits a phone screen without horizontal scroll', async ({ pag
     () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
   );
   expect(overflow).toBe(false);
-  await expect(page.getByRole('img', { name: 'Analog clock' })).toBeInViewport();
+  await expect(page.getByRole('slider', { name: /Analog clock/ })).toBeInViewport();
   await expect(page.getByTestId('time-phrase')).toBeInViewport();
 });
 

@@ -1,6 +1,6 @@
 {
   "name": "clock-simulator",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "private": true,
   "description": "Interactive analog wall clock with natural-language English time.",
   "license": "MIT",

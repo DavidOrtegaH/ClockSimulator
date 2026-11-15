@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Clock } from '../lib/clock.svelte';
-  import { pointerAngle, type Hand } from '../lib/time';
+  import { angleDelta, pointerAngle, type Hand } from '../lib/time';
   import * as s from '../styles/clock.css';
 
   interface Props {
@@ -29,44 +29,54 @@
     seconds: 'seconds',
   };
 
+  /** REQ-DRAG-009: dead zone around the pivot, as a fraction of the dial radius. */
+  const DEAD_ZONE = 0.15;
+  /** REQ-DRAG-009: larger single-move turns mean the pointer jumped across the centre. */
+  const MAX_STEP_DEG = 120;
+
   let dial: SVGSVGElement;
   let activePointer: number | null = null;
+  /** Pointer angle at the previous move; null until a usable position is known. */
+  let lastAngle: number | null = null;
 
-  /** Angle of the pointer around the dial centre; null when too close to the pivot. */
+  /** Angle of the pointer around the dial centre; null inside the dead zone. */
   function angleOf(e: PointerEvent): number | null {
     const r = dial.getBoundingClientRect();
+    const radius = Math.min(r.width, r.height) / 2;
     const dx = e.clientX - (r.left + r.width / 2);
     const dy = e.clientY - (r.top + r.height / 2);
-    if (Math.hypot(dx, dy) < r.width * 0.04) return null;
+    if (Math.hypot(dx, dy) < radius * DEAD_ZONE) return null;
     return pointerAngle(dx, dy);
   }
 
-  function follow(e: PointerEvent) {
-    const angle = angleOf(e);
-    if (angle !== null) clock.pointHandAt(angle);
-  }
-
-  // REQ-DRAG-001/002/006
+  // REQ-DRAG-001/002/006: grabbing never moves a hand.
   function onpointerdown(e: PointerEvent) {
     if (!e.isPrimary || activePointer !== null) return;
     if (e.pointerType === 'mouse' && e.button !== 0) return;
     e.preventDefault();
     activePointer = e.pointerId;
     dial.setPointerCapture(e.pointerId);
-    clock.dragging = true;
-    follow(e);
+    lastAngle = angleOf(e);
+    clock.beginDrag();
   }
 
-  // REQ-DRAG-003/008
+  // REQ-DRAG-002/003/008/009: turn the hand by how far the pointer turned, like a knob.
   function onpointermove(e: PointerEvent) {
-    if (e.pointerId === activePointer) follow(e);
+    if (e.pointerId !== activePointer) return;
+    const angle = angleOf(e);
+    if (angle !== null && lastAngle !== null) {
+      const delta = angleDelta(lastAngle, angle);
+      if (Math.abs(delta) <= MAX_STEP_DEG) clock.dragBy(delta);
+    }
+    lastAngle = angle;
   }
 
   // REQ-DRAG-004/006
   function endDrag(e: PointerEvent) {
     if (e.pointerId !== activePointer) return;
     activePointer = null;
-    clock.dragging = false;
+    lastAngle = null;
+    clock.endDrag();
   }
 
   // REQ-DRAG-007

@@ -8,6 +8,7 @@ import {
   normalize,
   pointerAngle,
   rotateHand,
+  snapKeepingSecond,
 } from './time';
 
 const hms = (h: number, m: number, s: number) => h * 3600 + m * 60 + s;
@@ -70,6 +71,14 @@ describe('time model', () => {
     expect(fromDate(new Date(2026, 0, 1, 15, 25, 42, 500))).toBe(12_342.5);
     expect(fromDate(new Date(2026, 0, 1, 0, 0, 0, 0))).toBe(0);
     expect(fromDate(new Date(2026, 0, 1, 12, 0, 1, 0))).toBe(1);
+  });
+
+  it('REQ-TIME-010: snaps to the nearest whole minute keeping the second', () => {
+    expect(snapKeepingSecond(hms(3, 15, 20), 42)).toBe(hms(3, 15, 42));
+    expect(snapKeepingSecond(hms(3, 15, 10.6), 42)).toBe(hms(3, 14, 42));
+    expect(snapKeepingSecond(hms(3, 15, 0), 0)).toBe(hms(3, 15, 0));
+    expect(snapKeepingSecond(5, 42)).toBe(hms(11, 59, 42));
+    expect(snapKeepingSecond(hms(11, 59, 50), 42.5)).toBe(hms(11, 59, 42.5));
   });
 
   it('REQ-TIME-009: decomposes into hour 1-12, minute and second', () => {

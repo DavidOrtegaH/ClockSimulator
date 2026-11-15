@@ -49,15 +49,18 @@ export function handAngles(t: number): HandAngles {
   };
 }
 
-/** Exact (non-ticking) angle of a hand, used to compute drag deltas. */
-export function exactHandAngle(t: number, hand: Hand): number {
-  const perTurn = SECONDS_PER_TURN[hand];
-  return ((normalize(t) % perTurn) / perTurn) * 360;
-}
-
 /** REQ-TIME-005: turn one hand by `deltaDeg`; the others follow through the shared value. */
 export function rotateHand(t: number, hand: Hand, deltaDeg: number): number {
   return normalize(t + (deltaDeg * SECONDS_PER_TURN[hand]) / 360);
+}
+
+/**
+ * REQ-TIME-010: the nearest time to `t` whose position within the minute is `secondOfMinute`.
+ * Used when setting the clock with the hour or minute hand so the seconds stay put.
+ */
+export function snapKeepingSecond(t: number, secondOfMinute: number): number {
+  const minutes = Math.round((t - secondOfMinute) / 60);
+  return normalize(minutes * 60 + secondOfMinute);
 }
 
 /** REQ-TIME-006: shortest signed difference from `from` to `to`, in (-180, 180]. */

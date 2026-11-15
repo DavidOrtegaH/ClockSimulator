@@ -1,7 +1,16 @@
 import { describe, expect, it } from 'vitest';
 import { Clock } from './clock.svelte';
+import type { Hand } from './time';
 
 const hms = (h: number, m: number, s: number) => h * 3600 + m * 60 + s;
+
+/** Simulates a pointer drag made of many small movements. */
+function drag(clock: Clock, hand: Hand, totalDeg: number, steps = 30) {
+  clock.hand = hand;
+  clock.beginDrag();
+  for (let i = 0; i < steps; i++) clock.dragBy(totalDeg / steps);
+  clock.endDrag();
+}
 
 describe('Clock state', () => {
   it('REQ-FACE-004: advances in real time while playing', () => {
@@ -25,30 +34,49 @@ describe('Clock state', () => {
     expect(clock.time).toBe(1);
   });
 
-  it('REQ-DRAG-002/003: pointing the minute hand moves the hour hand along', () => {
+  it('REQ-DRAG-002: starting a drag does not move any hand', () => {
     const clock = new Clock(hms(3, 0, 0));
-    clock.hand = 'minutes';
-    clock.pointHandAt(90);
-    expect(clock.time).toBeCloseTo(hms(3, 15, 0));
+    clock.beginDrag();
+    expect(clock.time).toBe(hms(3, 0, 0));
+    expect(clock.dragging).toBe(true);
+    clock.endDrag();
+    expect(clock.dragging).toBe(false);
+  });
+
+  it('REQ-DRAG-003: a quarter turn of the minute hand moves the hour hand along', () => {
+    const clock = new Clock(hms(3, 0, 0));
+    drag(clock, 'minutes', 90);
+    expect(clock.time).toBe(hms(3, 15, 0));
     expect(clock.angles.hours).toBeCloseTo(97.5);
   });
 
   it('REQ-DRAG-003: dragging the minute hand past 12 advances the hour', () => {
     const clock = new Clock(hms(3, 50, 0));
-    clock.hand = 'minutes';
-    for (const angle of [320, 340, 0, 20, 40, 60]) clock.pointHandAt(angle);
-    expect(clock.time).toBeCloseTo(hms(4, 10, 0));
+    drag(clock, 'minutes', 120);
+    expect(clock.time).toBe(hms(4, 10, 0));
   });
 
-  it('REQ-DRAG-003: pointing the hour hand and the seconds hand', () => {
-    const clock = new Clock(hms(3, 0, 0));
+  it('REQ-DRAG-003/REQ-TIME-010: the hour hand keeps the seconds still', () => {
+    const clock = new Clock(hms(3, 0, 42));
     clock.hand = 'hours';
-    clock.pointHandAt(180);
-    expect(clock.time).toBeCloseTo(hms(6, 0, 0));
+    clock.beginDrag();
+    for (let i = 0; i < 90; i++) {
+      clock.dragBy(1);
+      expect(clock.angles.seconds).toBe(252);
+    }
+    clock.endDrag();
+    expect(clock.time).toBe(hms(6, 0, 42));
+  });
 
-    clock.time = hms(3, 0, 0);
-    clock.hand = 'seconds';
-    clock.pointHandAt(270);
+  it('REQ-DRAG-003/REQ-TIME-010: slow minute drags accumulate instead of being lost', () => {
+    const clock = new Clock(hms(3, 0, 10));
+    drag(clock, 'minutes', 6, 60); // 0.1° per move = 1 s each
+    expect(clock.time).toBe(hms(3, 1, 10));
+  });
+
+  it('REQ-DRAG-003: the seconds hand drags minutes and hours proportionally', () => {
+    const clock = new Clock(hms(3, 0, 0));
+    drag(clock, 'seconds', -90);
     expect(clock.time).toBeCloseTo(hms(2, 59, 45));
   });
 
@@ -70,8 +98,11 @@ describe('Clock state', () => {
     clock.tick(5);
     expect(clock.time).toBe(0);
     clock.playing = true;
-    clock.dragging = true;
+    clock.beginDrag();
     clock.tick(5);
     expect(clock.time).toBe(0);
+    clock.endDrag();
+    clock.tick(5);
+    expect(clock.time).toBe(5);
   });
 });

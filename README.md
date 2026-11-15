@@ -18,13 +18,13 @@ and read the time in plain English underneath.
 
 ## Tech stack
 
-| Area    | Choice                                              |
-| ------- | --------------------------------------------------- |
-| UI      | [Svelte 5](https://svelte.dev) + TypeScript         |
-| Build   | [Vite](https://vite.dev)                            |
-| Styling | [vanilla-extract](https://vanilla-extract.style)    |
-| Tests   | Vitest (unit) + Playwright (end-to-end)             |
-| CI/CD   | GitHub Actions → GitHub Pages                       |
+| Area    | Choice                                           |
+| ------- | ------------------------------------------------ |
+| UI      | [Svelte 5](https://svelte.dev) + TypeScript      |
+| Build   | [Vite](https://vite.dev)                         |
+| Styling | [vanilla-extract](https://vanilla-extract.style) |
+| Tests   | Vitest (unit) + Playwright (end-to-end)          |
+| CI/CD   | GitHub Actions → GitHub Pages                    |
 
 ## Getting started
 
@@ -50,11 +50,11 @@ acceptance criteria, and tests reference those IDs.
 
 ### Branching (Git Flow)
 
-| Branch      | Purpose                                         |
-| ----------- | ----------------------------------------------- |
-| `main`      | Production. Every push deploys to GitHub Pages. |
-| `develop`   | Integration branch for the next release.        |
-| `feature/*` | One branch per feature, merged into `develop`.  |
+| Branch      | Purpose                                                          |
+| ----------- | ---------------------------------------------------------------- |
+| `main`      | Production. Every push deploys to GitHub Pages.                  |
+| `develop`   | Integration branch for the next release.                         |
+| `feature/*` | One branch per feature, merged into `develop`.                   |
 | `release/*` | Release preparation, merged into `main` and back into `develop`. |
 
 ### Commits

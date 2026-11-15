@@ -7,7 +7,7 @@ export const controls = style({
   flexWrap: 'wrap',
   justifyContent: 'center',
   alignItems: 'center',
-  gap: 12,
+  gap: 'clamp(6px, 1.5dvh, 12px) 12px',
   maxWidth: '100%',
 });
 
@@ -61,6 +61,8 @@ export const solo = style([
     background: vars.color.surface,
     paddingLeft: 18,
     paddingRight: 20,
+    // Same width for "Pause" and "Play" so the row never shifts (REQ-FACE-010).
+    minWidth: '7.25rem',
   },
 ]);
 

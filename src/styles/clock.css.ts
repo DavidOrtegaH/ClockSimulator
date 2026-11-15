@@ -1,12 +1,11 @@
 import { style, styleVariants } from '@vanilla-extract/css';
 import { vars } from './theme.css';
 
-/** REQ-FACE-006 */
+/** REQ-FACE-006: the largest square that fits the space left in the layout. */
 export const dial = style({
   display: 'block',
-  width: 'min(90vw, 60dvh, 520px)',
-  height: 'auto',
-  aspectRatio: '1',
+  width: 'min(100cqw, 100cqh, 760px)',
+  height: 'min(100cqw, 100cqh, 760px)',
   borderRadius: '50%',
   cursor: 'grab',
   // REQ-DRAG-005: the dial owns all touch gestures.

@@ -4,7 +4,7 @@ import { expect, test, type Page } from '@playwright/test';
 async function dialPoint(page: Page, angle: number, factor = 0.6) {
   const box = await page.getByRole('slider', { name: /Analog clock/ }).boundingBox();
   if (!box) throw new Error('Dial not visible');
-  const r = (box.width / 2) * factor;
+  const r = (Math.min(box.width, box.height) / 2) * factor;
   const rad = (angle * Math.PI) / 180;
   return {
     x: box.x + box.width / 2 + r * Math.sin(rad),
@@ -27,70 +27,92 @@ async function expectAngle(page: Page, hand: string, expected: number, tolerance
   expect(angularGap(await rotation(page, hand), expected)).toBeLessThanOrEqual(tolerance);
 }
 
-async function drag(page: Page, angles: number[]) {
-  const [first, ...rest] = angles;
-  const start = await dialPoint(page, first ?? 0);
+/** Drags around the dial through the given angles (degrees clockwise from 12). */
+async function drag(page: Page, from: number, to: number, stepDeg = 10) {
+  const start = await dialPoint(page, from);
   await page.mouse.move(start.x, start.y);
   await page.mouse.down();
-  for (const angle of rest) {
-    const p = await dialPoint(page, angle);
-    await page.mouse.move(p.x, p.y, { steps: 3 });
+  const dir = Math.sign(to - from);
+  for (let a = from + dir * stepDeg; dir * (to - a) >= 0; a += dir * stepDeg) {
+    const p = await dialPoint(page, a);
+    await page.mouse.move(p.x, p.y);
   }
   await page.mouse.up();
 }
 
-async function setUp(page: Page, h: number, m: number, pause = true) {
-  await page.clock.install({ time: new Date(2026, 0, 15, h, m, 0) });
+async function setUp(page: Page, h: number, m: number, s = 0, pause = true) {
+  await page.clock.install({ time: new Date(2026, 0, 15, h, m, s) });
   await page.goto('./');
   if (pause) await page.getByRole('button', { name: 'Pause' }).click();
 }
 
-test('REQ-DRAG-002/003: pressing at 3 sets the minute hand and drags the hour hand', async ({
-  page,
-}) => {
+const phrase = (page: Page) => page.getByTestId('time-phrase');
+
+test('REQ-DRAG-002: pressing without moving does not move any hand', async ({ page }) => {
   await setUp(page, 15, 0);
-  await drag(page, [90]);
-  await expectAngle(page, 'minutes', 90, 1.5);
-  await expectAngle(page, 'hours', 97.5, 0.5);
-  await expect(page.getByTestId('time-phrase')).toContainText(/quarter past three|past three/);
+  const before = await phrase(page).textContent();
+  const p = await dialPoint(page, 135);
+  await page.mouse.move(p.x, p.y);
+  await page.mouse.down();
+  await page.mouse.up();
+  await expect(phrase(page)).toHaveText(before ?? '');
+  await expectAngle(page, 'minutes', 0, 0.1);
+});
+
+test('REQ-DRAG-003: a quarter turn of the minute hand drags the hour hand', async ({ page }) => {
+  await setUp(page, 15, 0);
+  await drag(page, 200, 290);
+  await expect(phrase(page)).toContainText("It's a quarter past three in the afternoon");
+  await expectAngle(page, 'minutes', 90, 0.1);
+  await expectAngle(page, 'hours', 97.5, 0.1);
 });
 
 test('REQ-DRAG-003: dragging the minute hand past 12 advances the hour', async ({ page }) => {
   await setUp(page, 15, 50);
-  await drag(page, [300, 330, 0, 30, 60]);
-  await expectAngle(page, 'minutes', 60, 1.5);
-  await expectAngle(page, 'hours', 125, 0.5);
-  await expect(page.getByTestId('time-phrase')).toContainText('past four');
+  await drag(page, 300, 420);
+  await expect(phrase(page)).toContainText("It's ten past four in the afternoon");
 });
 
-test('REQ-DRAG-003: the hour hand carries the minute hand with it', async ({ page }) => {
-  await setUp(page, 15, 0);
+test('REQ-DRAG-003/REQ-TIME-010: the hour hand keeps the seconds still', async ({ page }) => {
+  await setUp(page, 15, 0, 42);
   await page.getByRole('button', { name: 'Hours' }).click();
-  await drag(page, [90, 120, 150, 180]);
-  await expectAngle(page, 'hours', 180, 0.5);
-  await expectAngle(page, 'minutes', 0, 6);
+  await drag(page, 0, 90);
+  await expectAngle(page, 'hours', 180, 1);
+  expect(await rotation(page, 'seconds')).toBe(252);
+  await expect(phrase(page)).toContainText('and forty-two seconds');
 });
 
-test('REQ-DRAG-003: the seconds hand takes the shortest way round', async ({ page }) => {
+test('REQ-DRAG-003: the seconds hand drags minutes back', async ({ page }) => {
   await setUp(page, 15, 0);
   await page.getByRole('button', { name: 'Seconds' }).click();
-  await drag(page, [270]);
+  await drag(page, 90, 0);
   await expectAngle(page, 'seconds', 270, 6);
-  await expect(page.getByTestId('time-phrase')).toContainText(/to three|past two/);
+  await expect(phrase(page)).toContainText("It's one minute to three in the afternoon");
+});
+
+test('REQ-DRAG-009: dragging through the centre does not jump', async ({ page }) => {
+  await setUp(page, 15, 0);
+  const a = await dialPoint(page, 90, 0.8);
+  const b = await dialPoint(page, 270, 0.8);
+  await page.mouse.move(a.x, a.y);
+  await page.mouse.down();
+  await page.mouse.move(b.x, b.y, { steps: 25 });
+  await page.mouse.up();
+  await expectAngle(page, 'minutes', 0, 1);
+  await expect(phrase(page)).toContainText("It's three o'clock in the afternoon");
 });
 
 test('REQ-DRAG-004: the clock holds still while dragging and resumes after', async ({ page }) => {
-  await setUp(page, 15, 0, false);
-  const phrase = page.getByTestId('time-phrase');
+  await setUp(page, 15, 0, 0, false);
   const p = await dialPoint(page, 90);
   await page.mouse.move(p.x, p.y);
   await page.mouse.down();
-  const held = await phrase.textContent();
+  const held = await phrase(page).textContent();
   await page.clock.runFor(2000);
-  await expect(phrase).toHaveText(held ?? '');
+  await expect(phrase(page)).toHaveText(held ?? '');
   await page.mouse.up();
   await page.clock.runFor(2000);
-  await expect(phrase).not.toHaveText(held ?? '');
+  await expect(phrase(page)).not.toHaveText(held ?? '');
 });
 
 test('REQ-DRAG-005: a touch drag moves the hand without scrolling the page', async ({
@@ -107,11 +129,11 @@ test('REQ-DRAG-005: a touch drag moves the hand without scrolling the page', asy
     const points = angle === undefined ? [] : [await dialPoint(page, angle)];
     await cdp.send('Input.dispatchTouchEvent', { type, touchPoints: points } as never);
   };
-  await touch('touchStart', 0);
-  for (const angle of [15, 30, 45, 60, 75, 90]) await touch('touchMove', angle);
+  await touch('touchStart', 180);
+  for (let angle = 190; angle <= 270; angle += 10) await touch('touchMove', angle);
   await touch('touchEnd');
 
-  await expectAngle(page, 'minutes', 90, 1.5);
+  await expect(phrase(page)).toContainText("It's a quarter past three in the afternoon");
   expect(await page.evaluate(() => window.scrollY)).toBe(0);
 });
 
@@ -121,12 +143,11 @@ test('REQ-DRAG-007: arrow keys step the selected hand', async ({ page }) => {
   await dial.focus();
   await page.keyboard.press('ArrowRight');
   await page.keyboard.press('ArrowRight');
-  const phrase = page.getByTestId('time-phrase');
-  await expect(phrase).toContainText("It's two minutes past three in the afternoon");
+  await expect(phrase(page)).toContainText("It's two minutes past three in the afternoon");
   await expect(dial).toHaveAttribute('aria-valuetext', /^It's two minutes past three/);
 
   await page.getByRole('button', { name: 'Hours' }).click();
   await dial.focus();
   await page.keyboard.press('PageUp');
-  await expect(phrase).toContainText("It's two minutes past eight in the morning");
+  await expect(phrase(page)).toContainText("It's two minutes past eight in the morning");
 });

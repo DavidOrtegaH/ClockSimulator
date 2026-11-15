@@ -3,7 +3,7 @@
  * All behaviour is expressed in terms of the pure time model (spec 001) and phrase (spec 002).
  */
 import { describeTime, type Period } from './phrase';
-import { angleDelta, exactHandAngle, handAngles, normalize, rotateHand, type Hand } from './time';
+import { handAngles, normalize, rotateHand, snapKeepingSecond, type Hand } from './time';
 
 export class Clock {
   /** Seconds on a 12-hour dial — the single source of truth (REQ-TIME-001). */
@@ -28,12 +28,35 @@ export class Clock {
   }
 
   /**
-   * REQ-DRAG-002/003: turn the selected hand the shortest way until it points at `angle`
-   * (degrees clockwise from 12). The other hands follow through the shared time value.
+   * Unsnapped time accumulated over the current drag, plus the second to keep when
+   * setting hours or minutes. Null when no drag is in progress.
    */
-  pointHandAt(angle: number): void {
-    const delta = angleDelta(exactHandAngle(this.time, this.hand), angle);
-    this.time = rotateHand(this.time, this.hand, delta);
+  #drag: { continuous: number; second: number } | null = null;
+
+  /** REQ-DRAG-002/004: grab the selected hand without moving it and stop the clock. */
+  beginDrag(): void {
+    this.#drag = { continuous: this.time, second: this.time % 60 };
+    this.dragging = true;
+  }
+
+  /**
+   * REQ-DRAG-003: turn the selected hand by `deltaDeg`. The seconds hand carries minutes and
+   * hours with it; the hour and minute hands leave the seconds still (REQ-TIME-010).
+   * Deltas are accumulated unsnapped so slow drags are never lost to rounding.
+   */
+  dragBy(deltaDeg: number): void {
+    if (!this.#drag) return;
+    this.#drag.continuous = rotateHand(this.#drag.continuous, this.hand, deltaDeg);
+    this.time =
+      this.hand === 'seconds'
+        ? this.#drag.continuous
+        : snapKeepingSecond(this.#drag.continuous, this.#drag.second);
+  }
+
+  /** REQ-DRAG-004: release the hand; the clock continues from the new time if playing. */
+  endDrag(): void {
+    this.#drag = null;
+    this.dragging = false;
   }
 
   /** REQ-DRAG-007: move the selected hand by whole units (1 h, 1 min or 1 s). */

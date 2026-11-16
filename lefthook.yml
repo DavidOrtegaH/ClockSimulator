@@ -1,0 +1,15 @@
+# Git hooks (REQ-QA-001/002). Installed by `pnpm install` through the `prepare` script.
+commit-msg:
+  commands:
+    commitlint:
+      run: pnpm exec commitlint --edit {1}
+
+pre-commit:
+  parallel: true
+  commands:
+    prettier:
+      glob: '*.{ts,js,svelte,json,md,yml,yaml,html,css}'
+      run: pnpm exec prettier --check {staged_files}
+    eslint:
+      glob: '*.{ts,js,svelte}'
+      run: pnpm exec eslint {staged_files}

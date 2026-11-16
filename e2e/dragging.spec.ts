@@ -133,7 +133,9 @@ test('REQ-DRAG-005: a touch drag moves the hand without scrolling the page', asy
   for (let angle = 190; angle <= 270; angle += 10) await touch('touchMove', angle);
   await touch('touchEnd');
 
-  await expect(phrase(page)).toContainText("It's a quarter past three in the afternoon");
+  // Emulated touch points are rounded to whole pixels, so allow one minute (6°) either way.
+  await expectAngle(page, 'minutes', 90, 6);
+  await expect(phrase(page)).toContainText('past three in the afternoon');
   expect(await page.evaluate(() => window.scrollY)).toBe(0);
 });
 

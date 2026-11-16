@@ -4,6 +4,24 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [1.2.0] — 2026-11-16
+
+### Added
+
+- Keyboard shortcuts: `H` `M` `S` choose the hand, `Space`/`K` play or pause, `D`/`N` day or night, `T` back to the current time ([spec 007](specs/007-usability.md)).
+- **Now** button that puts the clock back on the device's time.
+- Web app manifest, theme colour and Open Graph tags, so the app can be added to the home screen and links preview nicely.
+- Automated WCAG 2.2 AA accessibility audit in light and dark mode ([spec 008](specs/008-quality-gates.md)).
+- Commit message and staged-file checks with commitlint and Lefthook; `.nvmrc`, `.editorconfig` and a pull request template.
+- CodeQL analysis, dependency review on pull requests, and a 24-hour minimum age for new package versions ([spec 006](specs/006-security-and-deployment.md)).
+
+### Changed
+
+- The dial only announces seconds to screen readers when they matter.
+- Long-pressing the dial no longer opens the context menu on touch screens.
+- Dependabot waits a few days before proposing updates and skips TypeScript 7 until the toolchain supports it.
+- README rewritten.
+
 ## [1.1.0] — 2026-11-15
 
 ### Fixed
@@ -25,5 +43,6 @@ All notable changes to this project are documented here. The format follows
 - Drag the selected hand with touch, mouse or pen, or step it with the keyboard ([spec 005](specs/005-hand-dragging.md)).
 - Strict Content Security Policy, CI with audit, Dependabot and GitHub Pages deployment ([spec 006](specs/006-security-and-deployment.md)).
 
+[1.2.0]: https://github.com/DavidOrtegaH/ClockSimulator/releases/tag/v1.2.0
 [1.0.0]: https://github.com/DavidOrtegaH/ClockSimulator/releases/tag/v1.0.0
 [1.1.0]: https://github.com/DavidOrtegaH/ClockSimulator/releases/tag/v1.1.0

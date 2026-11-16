@@ -59,12 +59,19 @@ export const solo = style([
   {
     border: `1px solid ${vars.color.line}`,
     background: vars.color.surface,
-    paddingLeft: 18,
-    paddingRight: 20,
-    // Same width for "Pause" and "Play" so the row never shifts (REQ-FACE-010).
-    minWidth: '7.25rem',
+    paddingLeft: 14,
+    paddingRight: 16,
   },
 ]);
+
+/** Same width for "Pause" and "Play" so the row never shifts (REQ-FACE-010). */
+export const toggle = style([solo, { minWidth: '6.75rem' }]);
+
+/** Keeps Pause/Play and Now together when the row wraps. */
+export const pair = style({
+  display: 'inline-flex',
+  gap: 8,
+});
 
 export const icon = style({
   width: 18,

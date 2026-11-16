@@ -1,0 +1,20 @@
+{
+  "name": "Clock Simulator",
+  "short_name": "Clock",
+  "description": "Drag the hands of an analog wall clock and read the time in plain English.",
+  "lang": "en",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f4f4f1",
+  "theme_color": "#f4f4f1",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

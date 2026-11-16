@@ -3,16 +3,32 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Clock Simulator</title>
     <meta
       name="description"
       content="Interactive analog wall clock that tells the time in plain English."
     />
     <meta name="referrer" content="no-referrer" />
     <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#f4f4f1" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#111113" media="(prefers-color-scheme: dark)" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Clock Simulator" />
+    <meta
+      property="og:description"
+      content="Drag the hands of an analog wall clock and read the time in plain English."
+    />
+    <meta property="og:url" content="https://davidortegah.github.io/ClockSimulator/" />
+    <meta name="twitter:card" content="summary" />
+
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
-    <title>Clock Simulator</title>
+    <link rel="manifest" href="./manifest.webmanifest" />
   </head>
   <body>
+    <noscript>
+      <p>Clock Simulator needs JavaScript to run. Please enable it and reload the page.</p>
+    </noscript>
     <div id="app"></div>
     <script type="module" src="/src/main.ts"></script>
   </body>

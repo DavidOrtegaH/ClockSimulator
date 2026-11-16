@@ -1,2 +1,7 @@
+# Only these packages may run install scripts.
 allowBuilds:
   esbuild: true
+
+# Refuse versions published less than 24 h ago (in minutes) — most malicious releases are
+# caught and pulled within hours.
+minimumReleaseAge: 1440

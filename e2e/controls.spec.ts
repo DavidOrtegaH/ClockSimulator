@@ -53,7 +53,7 @@ test('REQ-CTRL-005: Day is the default and Night changes the phrase', async ({ p
 
 test('REQ-CTRL-006: controls are keyboard operable with 44px targets', async ({ page }) => {
   const buttons = page.getByRole('button');
-  await expect(buttons).toHaveCount(6);
+  await expect(buttons).toHaveCount(7);
   for (const box of await buttons.evaluateAll((els) =>
     els.map((el) => el.getBoundingClientRect()),
   )) {

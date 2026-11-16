@@ -108,14 +108,15 @@
   aria-label="Analog clock — move the {HAND_NAMES[clock.hand]} hand"
   aria-valuemin={0}
   aria-valuemax={43199}
-  aria-valuenow={Math.floor(clock.time)}
-  aria-valuetext="{clock.phrase.main}, {clock.phrase.seconds}"
+  aria-valuenow={clock.valueNow}
+  aria-valuetext={clock.valueText}
   {onpointerdown}
   {onpointermove}
   onpointerup={endDrag}
   onpointercancel={endDrag}
   onlostpointercapture={endDrag}
   {onkeydown}
+  oncontextmenu={(e) => e.preventDefault()}
 >
   <circle class={s.rim} r="96" />
 

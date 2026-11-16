@@ -35,3 +35,5 @@ Each spec is a Markdown file named `NNN-short-name.md` with:
 | [004 Controls](004-controls.md)                             | `CTRL`   | Implemented |
 | [005 Hand dragging](005-hand-dragging.md)                   | `DRAG`   | Implemented |
 | [006 Security & deployment](006-security-and-deployment.md) | `SEC`    | Implemented |
+| [007 Usability](007-usability.md)                           | `UX`     | Implemented |
+| [008 Quality gates](008-quality-gates.md)                   | `QA`     | Implemented |

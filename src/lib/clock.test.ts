@@ -92,6 +92,34 @@ describe('Clock state', () => {
     expect(clock.time).toBe(hms(10, 2, 1));
   });
 
+  it('REQ-UX-003: syncing to now keeps play state, hand and period', () => {
+    const clock = new Clock(hms(9, 0, 0));
+    clock.playing = false;
+    clock.hand = 'hours';
+    clock.period = 'night';
+    clock.syncTo(hms(3, 25, 42));
+    expect(clock.time).toBe(hms(3, 25, 42));
+    expect(clock.playing).toBe(false);
+    expect(clock.hand).toBe('hours');
+    expect(clock.period).toBe('night');
+  });
+
+  it('REQ-UX-004: the accessible value only includes seconds when they matter', () => {
+    const clock = new Clock(hms(3, 25, 42.7));
+    expect(clock.valueText).toBe("It's twenty-five past three in the afternoon");
+    expect(clock.valueNow).toBe(hms(3, 25, 0));
+
+    clock.hand = 'seconds';
+    expect(clock.valueText).toBe(
+      "It's twenty-five past three in the afternoon, and forty-two seconds",
+    );
+    expect(clock.valueNow).toBe(hms(3, 25, 42));
+
+    clock.hand = 'minutes';
+    clock.playing = false;
+    expect(clock.valueText).toContain('and forty-two seconds');
+  });
+
   it('does not advance while paused or while a hand is being dragged', () => {
     const clock = new Clock(0);
     clock.playing = false;

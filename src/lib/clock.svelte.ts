@@ -17,6 +17,15 @@ export class Clock {
   readonly angles = $derived(handAngles(this.time));
   readonly phrase = $derived(describeTime(this.time, this.period));
 
+  /** REQ-UX-004: seconds only matter to assistive tech when they are being set or frozen. */
+  readonly #withSeconds = $derived(this.hand === 'seconds' || !this.playing);
+  readonly valueText = $derived(
+    this.#withSeconds ? `${this.phrase.main}, ${this.phrase.seconds}` : this.phrase.main,
+  );
+  readonly valueNow = $derived(
+    this.#withSeconds ? Math.floor(this.time) : Math.floor(this.time / 60) * 60,
+  );
+
   constructor(start: number) {
     this.time = normalize(start);
   }
@@ -57,6 +66,11 @@ export class Clock {
   endDrag(): void {
     this.#drag = null;
     this.dragging = false;
+  }
+
+  /** REQ-UX-003: jump to a given time (e.g. the device clock) keeping every other setting. */
+  syncTo(t: number): void {
+    this.time = normalize(t);
   }
 
   /** REQ-DRAG-007: move the selected hand by whole units (1 h, 1 min or 1 s). */

@@ -22,6 +22,10 @@ All notable changes to this project are documented here. The format follows
 - Dependabot waits a few days before proposing updates and skips TypeScript 7 until the toolchain supports it.
 - README rewritten.
 
+### Fixed
+
+- Buttons no longer get cut off on small phones held sideways when the system font is wider (Linux, Android).
+
 ## [1.1.0] — 2026-11-15
 
 ### Fixed

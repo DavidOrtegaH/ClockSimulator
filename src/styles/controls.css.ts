@@ -51,6 +51,8 @@ export const button = style({
   },
   '@media': {
     '(max-width: 380px)': { padding: '0 12px' },
+    // Short landscape screens: tighter buttons, still at least 44 px tall (REQ-CTRL-006).
+    '(max-height: 420px)': { padding: '0 10px', fontSize: '0.9375rem', gap: 6 },
   },
 });
 

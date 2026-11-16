@@ -71,3 +71,25 @@ test('REQ-FACE-010: the dial does not move when the phrase changes length', asyn
   await page.getByRole('button', { name: 'Play' }).click();
   expect(await dial.boundingBox()).toEqual(before);
 });
+
+test.describe('REQ-FACE-006: wider system fonts', () => {
+  // Verdana (Windows/macOS) and DejaVu Sans (Linux) are among the widest common UI fonts.
+  test.use({ bypassCSP: true });
+
+  for (const vp of [
+    { width: 568, height: 320 },
+    { width: 320, height: 480 },
+    { width: 740, height: 360 },
+  ]) {
+    test(`still fits at ${vp.width}×${vp.height}`, async ({ page }) => {
+      await page.setViewportSize(vp);
+      await page.goto('./');
+      await page.addStyleTag({
+        content: '* { font-family: Verdana, "DejaVu Sans", sans-serif !important; }',
+      });
+      await expectFullyVisible(page, 'button');
+      await expectFullyVisible(page, '[data-testid="time-phrase"]');
+      await expectFullyVisible(page, '[role="slider"]');
+    });
+  }
+});

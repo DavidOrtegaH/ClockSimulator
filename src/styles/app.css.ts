@@ -29,10 +29,11 @@ export const main = style({
   },
   '@media': {
     [SIDE_BY_SIDE]: {
-      gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)',
+      // The text column is at least as wide as its widest control; the dial takes the rest.
+      gridTemplateColumns: 'minmax(0, 1fr) fit-content(55%)',
       gridTemplateRows: 'minmax(0, 1fr) auto auto auto minmax(0, 1fr)',
       gridTemplateAreas: '"dial ." "dial title" "dial phrase" "dial controls" "dial ."',
-      columnGap: 24,
+      columnGap: 'clamp(12px, 3vw, 24px)',
       rowGap: 'clamp(6px, 2dvh, 16px)',
     },
   },
